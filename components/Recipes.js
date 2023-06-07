@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import {getCategories, getMealsByCategory} from "../utils/MaelAPI";
 import {useNavigation} from "@react-navigation/native";
 import StackNavigator from "@react-navigation/stack/src/navigators/createStackNavigator";
-import {RecipeDetails} from "./RecipeDetails";
+import {RoutedRecipeDetails} from "./RoutedRecipeDetails";
 
 const Stack = StackNavigator();
 
@@ -12,7 +12,7 @@ export const RecipeStack = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="RecipesList" component={Recipes} initialParams={{category: 'beef', amount: 99}}/>
-            <Stack.Screen name="RecipeDetails" component={RecipeDetails} options={{drawerItemStyle:{display: 'none'}}}/>
+            <Stack.Screen name="RecipeDetails" component={RoutedRecipeDetails} options={{drawerItemStyle:{display: 'none'}}}/>
         </Stack.Navigator>
     )
 }

@@ -12,7 +12,6 @@ const fetchData = async (url) => {
 export const getMealById = async (mealId) => {
     console.log('Fetching meal with id: '+mealId)
     const responseData = await fetchData(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`);
-    console.log('Finished fetching meal : '+ JSON.stringify(responseData.data.meals[0]))
     return responseData.data.meals[0];
 };
 
