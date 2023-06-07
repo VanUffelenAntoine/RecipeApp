@@ -10,7 +10,10 @@ const fetchData = async (url) => {
 }
 
 export const getMealById = async (mealId) => {
-    return await fetchData(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`)
+    console.log('Fetching meal with id: '+mealId)
+    const responseData = await fetchData(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`);
+    console.log('Finished fetching meal : '+ JSON.stringify(responseData.data.meals[0]))
+    return responseData.data.meals[0];
 };
 
 export const getRandomMeal = async () => {
@@ -34,8 +37,6 @@ export const getSignleCategory = async () => {
     const responseData = await fetchData(`https://www.themealdb.com/api/json/v1/1/categories.php`);
     const categorys = responseData.data.categories;
     const random = Math.floor(Math.random() * responseData.data.categories.length);
-    console.log('Random index generated:  '+random)
-    console.log('Random category : '+ JSON.stringify(categorys[random]))
     return await categorys[random];
 };
 
