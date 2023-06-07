@@ -13,7 +13,7 @@ const CategoryPreview = ({item}) => {
     }
 
     return <TouchableOpacity onPress={handleCardPress}>
-        <Card mode={'outlined'} style={{marginEnd: 10}}>
+        <Card mode={'outlined'} style={{margin: 5}}>
             <Card.Title title={item.strCategory}/>
         </Card>
     </TouchableOpacity>
@@ -31,10 +31,10 @@ export function Categories() {
         fetchCategories();
     }, []);
     console.log('------------------');
-    console.log(categories)
 
     return (
-        <View><FlatList
+        <View>
+            <FlatList
             data={categories}
             renderItem={RenderCategory}
             keyExtractor={(item) => item.idCategory}

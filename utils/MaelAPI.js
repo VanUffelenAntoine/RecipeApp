@@ -1,67 +1,45 @@
 import axios from 'axios';
 
-export const getMealById = async (mealId) => {
+const fetchData = async (url) => {
     try {
-        const response = await axios.get(
-            `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`
-        );
-        // Handle the response data here
-        console.log(response.data);
+        return await axios.get(url);
     } catch (error) {
         // Handle any errors
         console.error(error);
     }
+}
+
+export const getMealById = async (mealId) => {
+    return await fetchData(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`)
 };
 
 export const getRandomMeal = async () => {
-    try {
-        const response = await axios.get(
-            `https://www.themealdb.com/api/json/v1/1/random.php`
-        );
-        console.log(response.data.meals[0]);
-        return response.data.meals[0];
-    } catch (error) {
-        // Handle any errors
-        console.error(error);
-    }
+    const responseData = await fetchData(`https://www.themealdb.com/api/json/v1/1/random.php`);
+    return responseData.data.meals[0]
 };
 
 export const getMealsByCategory = async (category) => {
-    try {
-        const response = await axios.get(
-            `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`
-        );
-        console.log(response.data.meals);
-        return response.data.meals;
-    } catch (error) {
-        // Handle any errors
-        console.error(error);
-    }
+    const url =`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`;
+    const responseData = await fetchData(url);
+    return responseData.data.meals;
 };
 
 export const getRandomMeals = async () => {
-    try {
-        const response = await axios.get(
-            `https://www.themealdb.com/api/json/v1/1/randomselection.php`
-        );
-        // Handle the response data here
-        console.log(response.data);
-    } catch (error) {
-        // Handle any errors
-        console.error(error);
-    }
+    const responseData = await fetchData(`https://www.themealdb.com/api/json/v1/1/randomselection.php`);
+    return responseData;
+
+};
+
+export const getSignleCategory = async () => {
+    const responseData = await fetchData(`https://www.themealdb.com/api/json/v1/1/categories.php`);
+    const categorys = responseData.data.categories;
+    const random = Math.floor(Math.random() * responseData.data.categories.length);
+    console.log('Random index generated:  '+random)
+    console.log('Random category : '+ JSON.stringify(categorys[random]))
+    return await categorys[random];
 };
 
 export const getCategories = async () => {
-    try {
-        const response = await axios.get(
-            `https://www.themealdb.com/api/json/v1/1/categories.php`
-        );
-        // Handle the response data here
-        console.log(response.data.categories);
-        return response.data.categories;
-    } catch (error) {
-        // Handle any errors
-        console.error(error);
-    }
+    const responseData = await fetchData(`https://www.themealdb.com/api/json/v1/1/categories.php`);
+    return responseData.data.categories;
 };

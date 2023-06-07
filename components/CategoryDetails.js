@@ -1,7 +1,9 @@
 import {Button, Card, Modal, TextInput} from "react-native-paper";
 import {Text, TouchableOpacity, View} from "react-native";
-import React, {useState} from "react";
-import {getMealsByCategory} from "../utils/MaelAPI";
+import React, {useEffect, useState} from "react";
+import {getMealsByCategory, getSignleCategory} from "../utils/MaelAPI";
+import {useNavigation} from "@react-navigation/native";
+
 
 
 export function CategoryDetails({route}) {
@@ -9,17 +11,22 @@ export function CategoryDetails({route}) {
     const [amount, setAmount] = useState('');
     const {item} = route.params;
 
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        navigation.setOptions({title: item.strCategory})
+    }, [item])
+
     const handleModalVisibility = () => {
         setModalVisible(!modalVisible);
     };
 
     const handleConfirm = async () => {
         const category = item.strCategory;
-        const recipes = await getMealsByCategory(category);
-        // Perform any action with the entered amount
+
         console.log('Amount:', amount);
 
-        // Close the modal
+        navigation.navigate('Recipes', {category, amount});
         setModalVisible(false);
         setAmount('');
     };
@@ -38,16 +45,18 @@ export function CategoryDetails({route}) {
                 </TouchableOpacity>
             </Card.Actions>
         </Card>
-        <Modal visible={modalVisible} animationType="slide" onDismiss={handleModalVisibility} >
-                    <TextInput
-                        placeholder="Enter Amount of recipes"
-                        value={amount}
-                        onChangeText={setAmount}
-                        keyboardType="numeric"
-                        style={{ borderWidth: 1, borderColor: 'gray', padding: 8, borderRadius: 4 }}
-                    />
+        <Modal visible={modalVisible} animationType="slide" onDismiss={handleModalVisibility}>
+            <View style={{width: '80%', alignSelf: "center"}}>
+                <TextInput
+                    placeholder="Enter Amount of recipes"
+                    value={amount}
+                    onChangeText={setAmount}
+                    keyboardType="numeric"
+                    style={{borderWidth: 1, borderColor: 'gray', borderRadius: 4, marginVertical: 5}}
+                />
 
-                    <Button mode={'contained'} title="Confirm" onPress={handleConfirm}>Confirm</Button>
+                <Button mode={'contained'} title="Confirm" onPress={handleConfirm}>Confirm</Button>
+            </View>
         </Modal>
     </View>)
 }
