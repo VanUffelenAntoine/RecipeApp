@@ -37,7 +37,7 @@ export const Recipes = ({route}) => {
         if (amount <= 1) {
             navigation.getParent().setOptions({title: `Recipe for ${category}`});
         } else if (amount > recipes.length) {
-            navigation.getParent().setOptions({title: `${recipes.length} recipes for ${category}`});
+            navigation.getParent().setOptions({title: `${recipes.length !== 0 ? recipes.length : ''} Recipes for ${category}`});
         } else {
             navigation.getParent().setOptions({title: `${amount} recipes for ${category}`});
         }
