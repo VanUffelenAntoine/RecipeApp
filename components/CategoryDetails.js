@@ -1,7 +1,6 @@
 import {Button, Card, Modal, TextInput} from "react-native-paper";
 import {Text, TouchableOpacity, View} from "react-native";
 import React, {useEffect, useState} from "react";
-import {getMealsByCategory, getSignleCategory} from "../utils/MaelAPI";
 import {useNavigation} from "@react-navigation/native";
 
 
@@ -21,12 +20,12 @@ export function CategoryDetails({route}) {
         setModalVisible(!modalVisible);
     };
 
-    const handleConfirm = async () => {
+    const handleConfirm =  () => {
         const category = item.strCategory;
 
         console.log('Amount:', amount);
 
-        navigation.navigate('Recipes', {category, amount});
+        navigation.navigate('Recipes', {screen: 'RecipesList', params: {category, amount}});
         setModalVisible(false);
         setAmount('');
     };

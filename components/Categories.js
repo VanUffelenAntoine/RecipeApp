@@ -1,9 +1,10 @@
 import React from 'react';
-import {getCategories} from "../utils/MaelAPI";
-import {FlatList, Text, TouchableOpacity, View} from "react-native";
-import {Card, Title, Button} from 'react-native-paper';
+
+import {FlatList, TouchableOpacity, View} from "react-native";
+import {Card} from 'react-native-paper';
 import {useNavigation} from "@react-navigation/native";
 import {useEffect, useState} from "react";
+import {getCategories} from "../utils/MealAPI";
 
 const CategoryPreview = ({item}) => {
     const navigation = useNavigation();

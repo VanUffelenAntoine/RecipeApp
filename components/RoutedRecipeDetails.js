@@ -2,7 +2,7 @@ import {Card, Text} from "react-native-paper";
 import {ScrollView} from "react-native";
 import React, {useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
-import {getMealById} from "../utils/MaelAPI";
+import {getMealById} from "../utils/MealAPI";
 import { AntDesign } from '@expo/vector-icons';
 
 export const RecipeDetails = ({recipe,children}) => {
@@ -45,7 +45,11 @@ export const RoutedRecipeDetails = ({route}) => {
     useEffect(() => {
         const fetchFullRecipe = async () => setRecipeFull(await getMealById(recipe.idMeal));
         fetchFullRecipe();
-        navigation.setOptions({title : recipeFull.strMeal})
+        navigation.setOptions({title : recipeFull.strMeal});
+        navigation.getParent().setOptions({headerShown : false});
+        navigation.addListener('beforeRemove', () => {
+            navigation.getParent().setOptions({headerShown : true});
+        })
     },[recipe])
 
     return (<RecipeDetails recipe={recipeFull}/>)

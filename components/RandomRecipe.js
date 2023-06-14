@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {getRandomMeal} from "../utils/MaelAPI";
+import {getRandomMeal} from "../utils/MealAPI";
 import {RecipeDetails} from "./RoutedRecipeDetails";
 import {Text} from "react-native-paper";
 import {useNavigation} from "@react-navigation/native";
@@ -9,8 +9,6 @@ import { Feather } from '@expo/vector-icons';
 export const RandomRecipe = () => {
     const [randomRecipe, setRandomRecipe]= useState({});
     const navigation = useNavigation();
-    const ingredients = [];
-    const measures = [];
 
     navigation.setOptions({
         headerRight: () => (
@@ -23,16 +21,6 @@ export const RandomRecipe = () => {
         fetchRecipe();
     }, [])
 
-
-    for (let i = 1; i <= 20; i++) {
-        const ingredientKey = `strIngredient${i}`;
-        const measureKey = `strMeasure${i}`;
-
-        if (randomRecipe[ingredientKey] && randomRecipe[measureKey]) {
-            ingredients.push(randomRecipe[ingredientKey]);
-            measures.push(randomRecipe[measureKey]);
-        }
-    }
 
     return <RecipeDetails recipe={randomRecipe}>
         <Text variant={"titleSmall"}>Category : {randomRecipe.strCategory}</Text>
