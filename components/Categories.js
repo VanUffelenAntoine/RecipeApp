@@ -5,6 +5,9 @@ import {Card} from 'react-native-paper';
 import {useNavigation} from "@react-navigation/native";
 import {useEffect, useState} from "react";
 import {getCategories} from "../utils/MealAPI";
+import {trackPromise, usePromiseTracker} from "react-promise-tracker";
+import {LoadIndicator} from "./LoadIndicator";
+
 
 const CategoryPreview = ({item}) => {
     const navigation = useNavigation();
@@ -26,12 +29,19 @@ const RenderCategory = ({item}) => {
 
 export function Categories() {
     const [categories, setCategories] = useState(null);
+    const {promiseInProgress} = usePromiseTracker();
 
     useEffect(() => {
         const fetchCategories = async () => setCategories(await getCategories());
-        fetchCategories();
+        trackPromise(
+            fetchCategories()
+        );
     }, []);
-    console.log('------------------');
+
+
+    if (promiseInProgress){
+        return <LoadIndicator/>
+    }
 
     return (
         <View>
