@@ -41,8 +41,8 @@ export const Recipes = ({route}) => {
         } else {
             navigation.getParent().setOptions({title: `${amount} recipes for ${category}`});
         }
-
     }, [categoryState]);
+
 
     const neededRecipes = recipes.slice(0, amount);
 

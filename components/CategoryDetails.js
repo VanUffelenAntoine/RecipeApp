@@ -21,6 +21,10 @@ export function CategoryDetails({route}) {
     };
 
     const handleConfirm =  () => {
+        if (!/\d/.test(amount)) {
+            setAmount();
+            return alert('Please select a valid number');
+        }
         const category = item.strCategory;
 
         navigation.navigate('Recipes', {screen: 'RecipesList', params: {category, amount}});
