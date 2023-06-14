@@ -1,4 +1,4 @@
-import {Button, Card, Modal, TextInput} from "react-native-paper";
+import {Button, Card, Modal, TextInput, Title} from "react-native-paper";
 import {Text, TouchableOpacity, View} from "react-native";
 import React, {useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
@@ -23,13 +23,20 @@ export function CategoryDetails({route}) {
     const handleConfirm =  () => {
         const category = item.strCategory;
 
-        console.log('Amount:', amount);
-
         navigation.navigate('Recipes', {screen: 'RecipesList', params: {category, amount}});
         setModalVisible(false);
         setAmount('');
     };
 
+    console.log(JSON.stringify(item));
+    console.log(JSON.stringify(item) === '{}');
+
+    if (JSON.stringify(item) === '{}') {
+            return <View style={{flex: 1 , justifyContent: "center", alignContent: "center",textAlign: "center"}}>
+                <Title style={{textAlign: 'center'}}>Please select a category first</Title>
+                <Button onPress={() => navigation.navigate('Categories')}>Tap here to choose one!</Button>
+            </View>
+    }
 
     return (<View>
         <Card mode={'outlined'} style={{margin: 10}}>
