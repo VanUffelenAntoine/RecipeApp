@@ -23,29 +23,28 @@ export const RecipeStack = () => {
 export const Recipes = ({route}) => {
     const [recipes, setRecipes] = useState([]);
     const {category, amount} = route.params;
-    const [categoryState, setCategoryState] = useState([category, amount]);
+    const [categoryState, setCategoryState] = useState(category);
+    const [prevAmount, setPrevAmount] = useState(999);
     const navigation = useNavigation();
     const {promiseInProgress} = usePromiseTracker();
 
-    if (categoryState[0] !== category || categoryState[1] !== amount) setCategoryState([category, amount]);
+    if (categoryState !== category) setCategoryState(category);
+    if (prevAmount !== amount) setPrevAmount(amount);
 
-    console.log(`Chosen category: ${category} ------------ Chosen amount: ${amount}`);
-
-
-    //todo : Add loading indicator
     useEffect(() => {
         const fetchRecipe = async () => setRecipes(await getMealsByCategory(category));
-        trackPromise(fetchRecipe());
+        navigation.getParent().setOptions({title: `Fetching Recipes for ${category}`});
+        trackPromise(fetchRecipe()).then(() => {
+            if (amount <= 1) {
+                navigation.getParent().setOptions({title: `Recipe for ${category}`});
+            } else if (amount > recipes.length) {
+                navigation.getParent().setOptions({title: `${recipes.length !== 0 ? recipes.length : ''} Recipes for ${category}`});
+            } else {
+                navigation.getParent().setOptions({title: `${amount} recipes for ${category}`});
+            }
+        });
 
-        if (amount <= 1) {
-            navigation.getParent().setOptions({title: `Recipe for ${category}`});
-        } else if (amount > recipes.length) {
-            navigation.getParent().setOptions({title: `${recipes.length !== 0 ? recipes.length : ''} Recipes for ${category}`});
-        } else {
-            navigation.getParent().setOptions({title: `${amount} recipes for ${category}`});
-        }
-    }, [categoryState]);
-
+    }, [categoryState, amount]);
 
     const neededRecipes = recipes.slice(0, amount);
 
@@ -56,12 +55,12 @@ export const Recipes = ({route}) => {
         return <View><Title>You chosen 0 recipes</Title></View>
 
     return <ScrollView>
-        {recipes && neededRecipes.map(recipe => <RecipePreview key={recipe.idMeal} item={recipe}/>)}
+        {recipes && neededRecipes.map(recipe => <RecipePreview key={recipe.idMeal} item={recipe}
+                                                               navigation={navigation}/>)}
     </ScrollView>
 }
 
-export const RecipePreview = ({item}) => {
-    const navigation = useNavigation();
+export const RecipePreview = ({item, navigation}) => {
     const navigateRecipe = () => {
         const recipe = item
         navigation.navigate('RecipeDetails', {recipe})
