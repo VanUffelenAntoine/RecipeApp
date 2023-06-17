@@ -32,8 +32,9 @@ export function CategoryDetails({route}) {
         setAmount('');
     };
 
-    console.log(JSON.stringify(item));
-    console.log(JSON.stringify(item) === '{}');
+    const handleAll = () => {
+        navigation.navigate('Recipes', {screen: 'RecipesList', params: {category: item.strCategory,'amount' : '99'}});
+    }
 
     if (JSON.stringify(item) === '{}') {
             return <View style={{flex: 1 , justifyContent: "center", alignContent: "center",textAlign: "center"}}>
@@ -51,12 +52,17 @@ export function CategoryDetails({route}) {
             <Card.Cover source={{uri: `${item.strCategoryThumb}`}}/>
             <Card.Actions>
                 <TouchableOpacity onPress={handleModalVisibility}>
-                    <Button>Recipes</Button>
+                    <Button>Get x recipes</Button>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={handleAll}>
+                    <Button>Get all recipes</Button>
                 </TouchableOpacity>
             </Card.Actions>
+
         </Card>
         <Modal visible={modalVisible} animationType="slide" onDismiss={handleModalVisibility}>
-            <View style={{width: '80%', alignSelf: "center"}}>
+            <View style={{width: '80%', alignSelf: "center", backgroundColor: 'white', padding: 25, borderRadius: 20}}>
                 <TextInput
                     placeholder="Enter Amount of recipes"
                     value={amount}
@@ -65,7 +71,9 @@ export function CategoryDetails({route}) {
                     style={{borderWidth: 1, borderColor: 'gray', borderRadius: 4, marginVertical: 5}}
                 />
 
-                <Button mode={'contained'} title="Confirm" onPress={handleConfirm}>Confirm</Button>
+                <Button mode={'contained'} title="Confirm"
+                        style={{marginTop: 15}}
+                        onPress={handleConfirm}>Confirm</Button>
             </View>
         </Modal>
     </View>)

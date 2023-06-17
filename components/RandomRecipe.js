@@ -1,6 +1,6 @@
 import React from "react";
-import {RecipeDetails} from "./RoutedRecipeDetails";
 import {Text} from "react-native-paper";
+import {RecipeDetails} from "./RecipeDetails";
 
 export const RandomRecipe = ({randomRecipe}) => {
 
