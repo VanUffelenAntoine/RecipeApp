@@ -33,7 +33,7 @@ export function CategoryDetails({route}) {
     };
 
     const handleAll = () => {
-        navigation.navigate('Recipes', {screen: 'RecipesList', params: {category: item.strCategory,'amount' : '99'}});
+        navigation.navigate('Recipes', {screen: 'RecipesList', params: {category: item.strCategory,amount : '99'}});
     }
 
     if (JSON.stringify(item) === '{}') {

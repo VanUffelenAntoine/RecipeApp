@@ -1,5 +1,5 @@
 import {ScrollView, TouchableOpacity, View} from "react-native";
-import {Card, Title} from "react-native-paper";
+import {Button, Card, TextInput, Title} from "react-native-paper";
 import React, {useEffect, useState} from "react";
 import {getMealsByCategory} from "../utils/MealAPI";
 import {useNavigation} from "@react-navigation/native";
@@ -7,6 +7,9 @@ import StackNavigator from "@react-navigation/stack/src/navigators/createStackNa
 import {RoutedRecipeDetails} from "./RoutedRecipeDetails";
 import {trackPromise, usePromiseTracker} from "react-promise-tracker";
 import {LoadIndicator} from "./LoadIndicator";
+import DropDown from "react-native-paper-dropdown";
+import {useCategoryContext} from "../contexts/CategoryContext";
+import {Ionicons} from "@expo/vector-icons";
 
 const Stack = StackNavigator();
 
@@ -27,11 +30,22 @@ export const Recipes = ({route}) => {
     const [prevAmount, setPrevAmount] = useState(999);
     const navigation = useNavigation();
     const {promiseInProgress} = usePromiseTracker();
+    const [showDropDown, setShowDropDown] = useState(false);
+    const [filter, setFilter] = useState(false);
+    const categories = useCategoryContext();
+    const [dropdownCat, setDropdownCat] = useState(categories[0].strCategory);
+    const [inputAmount, setInputAmount] = useState(0);
+
+
+    const dropdDownList = categories.map((cat) => {
+        return {label: cat.strCategory, value: cat.strCategory}
+    });
 
     if (categoryState !== category) setCategoryState(category);
     if (prevAmount !== amount) setPrevAmount(amount);
 
     useEffect(() => {
+        setCategoryState(category);
         const fetchRecipe = async () => setRecipes(await getMealsByCategory(category));
         navigation.getParent().setOptions({title: `Fetching Recipes for ${category}`});
         trackPromise(fetchRecipe()).then(() => {
@@ -42,9 +56,20 @@ export const Recipes = ({route}) => {
             } else {
                 navigation.getParent().setOptions({title: `${amount} recipes for ${category}`});
             }
+            if (amount < recipes.length)
+                setInputAmount(amount.toString());
+            else
+                setInputAmount(recipes.length)
         });
+    }, [category, amount]);
 
-    }, [categoryState, amount]);
+    navigation.getParent().setOptions({
+        headerRight: () => (
+            <View>
+                <Ionicons style={{marginRight: 15}} name={'filter'} size={24} onPress={() => setFilter(!filter)}/>
+            </View>
+        ),
+    });
 
     const neededRecipes = recipes.slice(0, amount);
 
@@ -54,10 +79,39 @@ export const Recipes = ({route}) => {
     if (neededRecipes.length === 0)
         return <View><Title>You chosen 0 recipes</Title></View>
 
-    return <ScrollView>
-        {recipes && neededRecipes.map(recipe => <RecipePreview key={recipe.idMeal} item={recipe}
-                                                               navigation={navigation}/>)}
-    </ScrollView>
+    return <View>
+        <ScrollView>
+            {filter && <Card mode={'outlined'} style={{margin: 10}}>
+                <Card.Title title={'Filter Recipes'}/>
+                <Card.Content>
+                    <DropDown
+                        label={"Category"}
+                        mode={"outlined"}
+                        visible={showDropDown} onDismiss={() => setShowDropDown(false)}
+                        showDropDown={() => setShowDropDown(true)} value={dropdownCat} setValue={setDropdownCat}
+                        list={dropdDownList}/>
+                    <TextInput
+                        type={'outlined'}
+                        label={'Amount'}
+                        style={{marginTop: 15}}
+                        keyboardType={'numeric'}
+                        onChangeText={text => setInputAmount(text)}
+                        value={inputAmount}
+                    />
+                </Card.Content>
+                <Card.Actions>
+                    <TouchableOpacity onPress={() => navigation.navigate('Recipes', {
+                        screen: 'RecipesList',
+                        params: {category: dropdownCat, amount: inputAmount}
+                    })}>
+                        <Button>Apply changes</Button>
+                    </TouchableOpacity>
+                </Card.Actions>
+            </Card>}
+            {recipes && neededRecipes.map(recipe => <RecipePreview key={recipe.idMeal} item={recipe}
+                                                                   navigation={navigation}/>)}
+        </ScrollView>
+    </View>
 }
 
 export const RecipePreview = ({item, navigation}) => {

@@ -12,6 +12,8 @@ import {HomeScreen} from "./components/HomeScreen";
 import {RandomRecipe} from "./components/RandomRecipe";
 import {TouchableOpacity, View} from "react-native";
 import {Feather} from "@expo/vector-icons";
+import {PaperProvider} from "react-native-paper";
+import {CategoryDataProvider} from "./contexts/CategoryContext";
 
 const Drawer = createDrawerNavigator();
 
@@ -25,26 +27,30 @@ export default function App() {
     }, []);
 
     return (
-        <NavigationContainer>
-            <Drawer.Navigator>
-                <Drawer.Screen name="Home" component={HomeScreen}/>
-                <Drawer.Screen name="Categories" component={Categories}/>
-                <Drawer.Screen name="CategoryDetails" component={CategoryDetails}
-                               initialParams={{item: {}}}/>
-                <Drawer.Screen name={"Recipes"} component={RecipeStack}/>
-                <Drawer.Screen name={"Random recipe"}
-                               options={{
-                                   headerRight: () => (
-                                       <View style={{margin: 10}}><TouchableOpacity onPress={fetchRecipe}><Feather
-                                           name="refresh-ccw" size={24}/></TouchableOpacity></View>
-                                   ),
-                               }}>
-                    {
-                        (props) => <RandomRecipe {...props} randomRecipe={randomRecipe}/>
-                    }
-                </Drawer.Screen>
-            </Drawer.Navigator>
-        </NavigationContainer>
+        <CategoryDataProvider>
+            <PaperProvider>
+                <NavigationContainer>
+                    <Drawer.Navigator>
+                        <Drawer.Screen name="Home" component={HomeScreen}/>
+                        <Drawer.Screen name="Categories" component={Categories}/>
+                        <Drawer.Screen name="CategoryDetails" component={CategoryDetails}
+                                       initialParams={{item: {}}}/>
+                        <Drawer.Screen name={"Recipes"} component={RecipeStack}/>
+                        <Drawer.Screen name={"Random recipe"}
+                                       options={{
+                                           headerRight: () => (
+                                               <View style={{margin: 10}}><TouchableOpacity onPress={fetchRecipe}><Feather
+                                                   name="refresh-ccw" size={24}/></TouchableOpacity></View>
+                                           ),
+                                       }}>
+                            {
+                                (props) => <RandomRecipe {...props} randomRecipe={randomRecipe}/>
+                            }
+                        </Drawer.Screen>
+                    </Drawer.Navigator>
+                </NavigationContainer>
+            </PaperProvider>
+        </CategoryDataProvider>
     );
 }
 

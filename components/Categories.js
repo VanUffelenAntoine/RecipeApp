@@ -3,10 +3,7 @@ import React from 'react';
 import {FlatList, TouchableOpacity, View} from "react-native";
 import {Card} from 'react-native-paper';
 import {useNavigation} from "@react-navigation/native";
-import {useEffect, useState} from "react";
-import {getCategories} from "../utils/MealAPI";
-import {trackPromise, usePromiseTracker} from "react-promise-tracker";
-import {LoadIndicator} from "./LoadIndicator";
+import {useCategoryContext} from "../contexts/CategoryContext";
 
 
 const CategoryPreview = ({item}) => {
@@ -28,20 +25,7 @@ const RenderCategory = ({item}) => {
 };
 
 export function Categories() {
-    const [categories, setCategories] = useState(null);
-    const {promiseInProgress} = usePromiseTracker();
-
-    useEffect(() => {
-        const fetchCategories = async () => setCategories(await getCategories());
-        trackPromise(
-            fetchCategories()
-        );
-    }, []);
-
-
-    if (promiseInProgress){
-        return <LoadIndicator/>
-    }
+    const categories = useCategoryContext();
 
     return (
         <View>
