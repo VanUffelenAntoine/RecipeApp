@@ -17,7 +17,7 @@ export const RecipeStack = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="RecipesList" component={Recipes} options={{headerShown: false}}
-                          initialParams={{category: 'beef', amount: 99}}/>
+                          initialParams={{category: 'beef', amount: 1}}/>
             <Stack.Screen name="RecipeDetails" component={RoutedRecipeDetails}/>
         </Stack.Navigator>
     )
@@ -34,8 +34,9 @@ export const Recipes = ({route}) => {
     const [filter, setFilter] = useState(false);
     const categories = useCategoryContext();
     const [dropdownCat, setDropdownCat] = useState(categories[0].strCategory);
-    const [inputAmount, setInputAmount] = useState(0);
+    const [inputAmount, setInputAmount] = useState('0');
 
+    console.log(amount);
 
     const dropdDownList = categories.map((cat) => {
         return {label: cat.strCategory, value: cat.strCategory}
@@ -49,6 +50,7 @@ export const Recipes = ({route}) => {
         const fetchRecipe = async () => setRecipes(await getMealsByCategory(category));
         navigation.getParent().setOptions({title: `Fetching Recipes for ${category}`});
         trackPromise(fetchRecipe()).then(() => {
+            console.log('recipe lenght ' + recipes.length)
             if (amount <= 1) {
                 navigation.getParent().setOptions({title: `Recipe for ${category}`});
             } else if (amount > recipes.length) {
@@ -56,20 +58,22 @@ export const Recipes = ({route}) => {
             } else {
                 navigation.getParent().setOptions({title: `${amount} recipes for ${category}`});
             }
-            if (amount < recipes.length)
-                setInputAmount(amount.toString());
+            if (recipes.length === 0)
+                setInputAmount(amount)
+            else if (amount < recipes.length.toString())
+                setInputAmount(amount);
             else
-                setInputAmount(recipes.length)
+                setInputAmount(recipes.length.toString())
+
+            navigation.getParent().setOptions({
+                headerRight: () => (
+                    <View>
+                        <Ionicons style={{marginRight: 15}} name={'filter'} size={24} onPress={() => setFilter(!filter)}/>
+                    </View>
+                ),
+            });
         });
     }, [category, amount]);
-
-    navigation.getParent().setOptions({
-        headerRight: () => (
-            <View>
-                <Ionicons style={{marginRight: 15}} name={'filter'} size={24} onPress={() => setFilter(!filter)}/>
-            </View>
-        ),
-    });
 
     const neededRecipes = recipes.slice(0, amount);
 
@@ -95,8 +99,8 @@ export const Recipes = ({route}) => {
                         label={'Amount'}
                         style={{marginTop: 15}}
                         keyboardType={'numeric'}
-                        onChangeText={text => setInputAmount(text)}
-                        value={inputAmount}
+                        onChangeText={(text) => setInputAmount(text)}
+                        value={inputAmount.toString()}
                     />
                 </Card.Content>
                 <Card.Actions>
