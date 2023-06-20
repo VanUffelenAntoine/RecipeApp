@@ -1,5 +1,5 @@
 import {ScrollView, TouchableOpacity, View} from "react-native";
-import {Button, Card, TextInput, Title} from "react-native-paper";
+import { Card, Title} from "react-native-paper";
 import React, {useEffect, useState} from "react";
 import {getMealsByCategory} from "../utils/MealAPI";
 import {useNavigation} from "@react-navigation/native";
@@ -7,9 +7,8 @@ import StackNavigator from "@react-navigation/stack/src/navigators/createStackNa
 import {RoutedRecipeDetails} from "./RoutedRecipeDetails";
 import {trackPromise, usePromiseTracker} from "react-promise-tracker";
 import {LoadIndicator} from "./LoadIndicator";
-import DropDown from "react-native-paper-dropdown";
-import {useCategoryContext} from "../contexts/CategoryContext";
 import {Ionicons} from "@expo/vector-icons";
+import {RecipeFilter} from "./RecipeFilter";
 
 const Stack = StackNavigator();
 
@@ -24,46 +23,36 @@ export const RecipeStack = () => {
 }
 
 export const Recipes = ({route}) => {
-    const [recipes, setRecipes] = useState([]);
     const {category, amount} = route.params;
-    const [categoryState, setCategoryState] = useState(category);
-    const [prevAmount, setPrevAmount] = useState(999);
-    const navigation = useNavigation();
-    const {promiseInProgress} = usePromiseTracker();
-    const [showDropDown, setShowDropDown] = useState(false);
+
+    const [recipes, setRecipes] = useState([]);
     const [filter, setFilter] = useState(false);
-    const categories = useCategoryContext();
-    const [dropdownCat, setDropdownCat] = useState(categories[0].strCategory);
     const [inputAmount, setInputAmount] = useState('0');
 
-    console.log(amount);
-
-    const dropdDownList = categories.map((cat) => {
-        return {label: cat.strCategory, value: cat.strCategory}
-    });
-
-    if (categoryState !== category) setCategoryState(category);
-    if (prevAmount !== amount) setPrevAmount(amount);
+    const navigation = useNavigation();
+    const {promiseInProgress} = usePromiseTracker();
 
     useEffect(() => {
-        setCategoryState(category);
-        const fetchRecipe = async () => setRecipes(await getMealsByCategory(category));
+        const fetchRecipe = async () => {
+            const recipes = await getMealsByCategory(category);
+            setRecipes(recipes);
+            return recipes;
+        };
         navigation.getParent().setOptions({title: `Fetching Recipes for ${category}`});
-        trackPromise(fetchRecipe()).then(() => {
-            console.log('recipe lenght ' + recipes.length)
+        trackPromise(fetchRecipe()).then((fetchRecipes) => {
             if (amount <= 1) {
                 navigation.getParent().setOptions({title: `Recipe for ${category}`});
-            } else if (amount > recipes.length) {
-                navigation.getParent().setOptions({title: `${recipes.length !== 0 ? recipes.length : ''} Recipes for ${category}`});
+            } else if (amount > fetchRecipes.length) {
+                navigation.getParent().setOptions({title: `${fetchRecipes.length !== 0 ? fetchRecipes.length : ''} Recipes for ${category}`});
             } else {
                 navigation.getParent().setOptions({title: `${amount} recipes for ${category}`});
             }
-            if (recipes.length === 0)
+            if (fetchRecipes.length === 0)
                 setInputAmount(amount)
-            else if (amount < recipes.length.toString())
+            else if (amount < fetchRecipes.length.toString())
                 setInputAmount(amount);
             else
-                setInputAmount(recipes.length.toString())
+                setInputAmount(fetchRecipes.length.toString())
 
             navigation.getParent().setOptions({
                 headerRight: () => (
@@ -85,33 +74,8 @@ export const Recipes = ({route}) => {
 
     return <View>
         <ScrollView>
-            {filter && <Card mode={'outlined'} style={{margin: 10}}>
-                <Card.Title title={'Filter Recipes'}/>
-                <Card.Content>
-                    <DropDown
-                        label={"Category"}
-                        mode={"outlined"}
-                        visible={showDropDown} onDismiss={() => setShowDropDown(false)}
-                        showDropDown={() => setShowDropDown(true)} value={dropdownCat} setValue={setDropdownCat}
-                        list={dropdDownList}/>
-                    <TextInput
-                        type={'outlined'}
-                        label={'Amount'}
-                        style={{marginTop: 15}}
-                        keyboardType={'numeric'}
-                        onChangeText={(text) => setInputAmount(text)}
-                        value={inputAmount.toString()}
-                    />
-                </Card.Content>
-                <Card.Actions>
-                    <TouchableOpacity onPress={() => navigation.navigate('Recipes', {
-                        screen: 'RecipesList',
-                        params: {category: dropdownCat, amount: inputAmount}
-                    })}>
-                        <Button>Apply changes</Button>
-                    </TouchableOpacity>
-                </Card.Actions>
-            </Card>}
+            {filter && <RecipeFilter filter={filter} inputAmount={inputAmount}
+                                     setInputAmount={setInputAmount} category={category}/>}
             {recipes && neededRecipes.map(recipe => <RecipePreview key={recipe.idMeal} item={recipe}
                                                                    navigation={navigation}/>)}
         </ScrollView>
